@@ -1,8 +1,5 @@
 <template>
-  <div
-    :id="nodeId"
-    class="b-TextScroll"
-  >
+  <div :id="nodeId" class="b-TextScroll">
     <div class="text_wraper_jzk" @mouseenter="mouseenterHandle" @mouseleave="mouseleaveHandle" :id="nodeId + 'jzk'" />
   </div>
 </template>
@@ -48,16 +45,6 @@ export default defineComponent({
             isStart: true
 		})
 
-		// 创建item元素
-		const createItem = (dom) => {
-			const newItem = document.createElement('div')
-            newItem.className = 'text_scroll_item_temp' + idx
-			newItem.style.whiteSpace = 'nowrap'
-			newItem.style.marginRight = `${props.interval}px`
-			newItem.innerText = targeText
-            if (dom.id === params.nodeId + 'jzk') dom.appendChild(newItem)
-		}
-
 		// 初始化显示元素
 		const initItemsDom = () => {
 			// 当前容器
@@ -72,6 +59,16 @@ export default defineComponent({
 			params.transfromX = 0
 			params.defaultLeft = 0
 			judgeIsScroll(wraperDom)
+		}
+
+        // 创建item元素
+		const createItem = (dom) => {
+			const newItem = document.createElement('div')
+            newItem.className = 'text_scroll_item_temp' + idx
+			newItem.style.whiteSpace = 'nowrap'
+			newItem.style.marginRight = `${props.interval}px`
+			newItem.innerText = targeText
+            if (dom.id === params.nodeId + 'jzk') dom.appendChild(newItem)
 		}
 
 		// 判断是否滚动
@@ -142,7 +139,7 @@ export default defineComponent({
                 setTimeout(() => { clearInterval(ttmm) }, 5000)
             })(idx);
             // -----------------------------------------------------------------------------------------------------------------------------------------------
-            
+
 		})
 
 		return {
