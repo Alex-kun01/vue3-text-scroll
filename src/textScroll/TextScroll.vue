@@ -1,6 +1,8 @@
 <template>
   <div :id="nodeId" class="b-TextScroll">
-    <div class="text_wraper_jzk" @mouseenter="mouseenterHandle" @mouseleave="mouseleaveHandle" :id="nodeId + 'jzk'" />
+    <div class="text_wraper_jzk" @mouseenter="mouseenterHandle" @mouseleave="mouseleaveHandle" :id="nodeId + 'jzk'">
+        <div :class="{['text_scroll_item_temp' + idx]: 1}" :style="{marginRight: interval + 'px', whiteSpace: 'nowrap'}">{{text}}</div>
+    </div>
   </div>
 </template>
 
@@ -20,48 +22,57 @@ export default defineComponent({
 		},
 		interval: {
 			type: Number,
-			default: 100
+			default: 20
 		}
 	},
 	setup (props) {
+        /**
+         * 根节点：组件根节点
+         * 偏移容器：用于移动的元素 此元素没有宽度，通过内部的元素撑开宽度
+         * 文字容器：用于显示文字一行内容的元素， 宽度通过文字内容计算得出
+         */
         let nodeWraper = null;
+        // 去除换行符、回车符
         const targeText = props.text.replace(/[\r\n]/g,'');
 
         // 获取唯一ID
 		const getRadomId = () => {
 			return (Math.random() + '').substr(3, 3) + Date.now().toString(32)
 		}
+
+        // 获取一个唯一id所谓该组件的唯一标识
         const idx = getRadomId()
 
 		const params = reactive({
-			// 记录初始偏移量
-			defaultLeft: null,
-			transfromX: 0,
-			itemWidth: 0,
-			wraperWidth: 0,
-			timer: null,
-			nodeId: idx,
-            // 是否暂停
-            isStart: true
+			defaultLeft: null, // 记录【偏移容器】初始偏移量
+			transfromX: 0, // 【文字容器】的偏移量值
+			textWidth: 0, // 【文字容器】的宽度
+			wraperWidth: 0, // 【偏移容器】宽度
+			timer: null, // 定时器id
+			nodeId: idx, // 根节点唯一id
+            isStart: true // 是否暂停
 		})
 
 		// 初始化显示元素
 		const init = () => {
-			// 当前容器
+			// 获取该组件根节点
 			nodeWraper = document.getElementById(params.nodeId)
 			// 获取容器元素
 			const wraperDom = nodeWraper.children[0]
 			params.wraperWidth = wraperDom.offsetWidth
-			createItem(wraperDom)
-			// 获取item的宽度
+
+            // 创建一个文字容器
+			// createItem(wraperDom) // 第一个文字容器通过js创建会导致数据刷新闪屏
+
+			// 获取文字容器的宽度
 			const itemDoms = wraperDom.children
-			params.itemWidth = itemDoms[0].offsetWidth
+			params.textWidth = itemDoms[0].offsetWidth
 			params.transfromX = 0
 			params.defaultLeft = 0
 			judgeIsScroll(wraperDom)
 		}
 
-        // 创建item元素
+        // 创建一个【文字容器】 并添加到【偏移容器】中
 		const createItem = (dom) => {
 			const newItem = document.createElement('div')
             newItem.className = 'text_scroll_item_temp' + idx
@@ -73,7 +84,8 @@ export default defineComponent({
 
 		// 判断是否滚动
 		const judgeIsScroll = (wraperDom) => {
-			if (params.itemWidth > params.wraperWidth) {
+            // 如果一个文字容器的宽度 大于 
+			if (params.textWidth > params.wraperWidth) {
                 createItem(wraperDom)
 				setTimeout(() => { moveItem()  }, 10)
 			}
@@ -93,20 +105,29 @@ export default defineComponent({
 		const moveItem = () => {
 			params.timer = setInterval(() => {
                 if (!params.isStart) return
-				const nodeWraper = document.getElementById(params.nodeId).children[0]
+
+                // 获取根节点
+                const nodex = document.getElementById(params.nodeId)
+                if (!nodex) return
+
+                // 获取到文字容器的父元素
+				const nodeWraper = nodex.children[0]
                 deleteAsyncDom(nodeWraper)
+
+                // 初始化偏离量
 				nodeWraper.style.transform = `translateX(${params.transfromX - 1 + 'px'})`
 				params.transfromX = params.transfromX - 1
+                
 				// 当左移的距离等于item的宽度时
-				if (parseInt(params.transfromX.toString().replace('-', ''))  === params.itemWidth) {
+				if (parseInt(params.transfromX.toString().replace('-', ''))  === params.textWidth) {
 					// 获取当前的第一个子元素
 					const itemDom = nodeWraper.children[0]
 					// 删除第一个子元素
 					itemDom.remove()
-					// 将左边的偏移量重置
+					// 重置文字容器的偏移量
 					nodeWraper.style.transform =  `translateX(${params.defaultLeft + props.interval + 'px'})`
 					params.transfromX = params.defaultLeft + props.interval
-					// 在右边重新插入item元素
+					// 在右边创建并插入新的item元素
 					createItem(nodeWraper)
 				}
 			}, props.speed)
@@ -146,7 +167,8 @@ export default defineComponent({
 			...toRefs(params),
 			getRadomId,
             mouseenterHandle,
-            mouseleaveHandle
+            mouseleaveHandle,
+            idx
 		}
 	}
 })
