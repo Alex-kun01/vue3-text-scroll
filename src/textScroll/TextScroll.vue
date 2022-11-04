@@ -46,7 +46,7 @@ export default defineComponent({
 		})
 
 		// 初始化显示元素
-		const initItemsDom = () => {
+		const init = () => {
 			// 当前容器
 			nodeWraper = document.getElementById(params.nodeId)
 			// 获取容器元素
@@ -123,7 +123,7 @@ export default defineComponent({
         }
 
 		onMounted(() => {
-			setTimeout(() => { initItemsDom() }, 50)
+			setTimeout(() => { init() }, 50)
 		})
 
 		onUnmounted(() => {
