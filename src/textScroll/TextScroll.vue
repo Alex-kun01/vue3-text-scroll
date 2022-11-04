@@ -61,9 +61,6 @@ export default defineComponent({
 			const wraperDom = nodeWraper.children[0]
 			params.wraperWidth = wraperDom.offsetWidth
 
-            // 创建一个文字容器
-			// createItem(wraperDom) // 第一个文字容器通过js创建会导致数据刷新闪屏
-
 			// 获取文字容器的宽度
 			const itemDoms = wraperDom.children
 			params.textWidth = itemDoms[0].offsetWidth
@@ -87,7 +84,7 @@ export default defineComponent({
             // 如果一个文字容器的宽度 大于 
 			if (params.textWidth > params.wraperWidth) {
                 createItem(wraperDom)
-				setTimeout(() => { moveItem()  }, 10)
+				setTimeout(() => { moveDevictionBox()  }, 10)
 			}
 		}
 
@@ -101,8 +98,8 @@ export default defineComponent({
             })
         }
 
-		// 移动
-		const moveItem = () => {
+		// 移动【偏移容器】
+		const moveDevictionBox = () => {
 			params.timer = setInterval(() => {
                 if (!params.isStart) return
 
