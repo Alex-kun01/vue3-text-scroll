@@ -133,12 +133,16 @@ export default defineComponent({
 			clearInterval(params.timer);
             // 卸载根节点
             if (nodeWraper) nodeWraper.remove();
+
+            // 此段代码：强行解决上面的逻辑问题 ----------------------------------------------------------------------------------------------------------------
             // 立即执行函数闭包保留原始id
             (function(id){
                 // 每隔50毫秒清除一次临时dom
                 const ttmm = setInterval(() => { Array.from(document.getElementsByClassName('text_scroll_item_temp' + id)).forEach(el => el.remove()); }, 50)
                 setTimeout(() => { clearInterval(ttmm) }, 5000)
             })(idx);
+            // -----------------------------------------------------------------------------------------------------------------------------------------------
+            
 		})
 
 		return {
